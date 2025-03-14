@@ -32,6 +32,11 @@ export function Form() {
           type='number'
           placeholder='type your phone number'
         />
+        <Input
+          label='Phone number'
+          type='number'
+          placeholder='type your phone number'
+        />
       </div>
       <div className='flex justify-end absolute bottom-8 right-8'>
         <Button size={'lg'}>Next step</Button>
