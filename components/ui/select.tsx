@@ -61,7 +61,7 @@ const selectTriggerVariant = cva(
     // accesibility
     'focus:outline-0 focus:ring-1 ',
     'data-[state=open]:border-border-accent data-[state=open]:outline-0 ',
-    'data-[state=open]:ring-1 data-[state=open]:ring-border-accent data-[state=closed]:ring-border-accent [&>span]:line-clamp-1 [&>span]:text-left',
+    'data-[state=open]:ring-2 data-[state=open]:ring-sky-500 data-[state=closed]:ring-sky-500 [&>span]:line-clamp-1 [&>span]:text-left',
     'focus:data-[state=closed]:border-border-accent',
   ],
   {
