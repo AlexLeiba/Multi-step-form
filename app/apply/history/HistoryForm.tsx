@@ -57,6 +57,7 @@ export function HistoryForm() {
   }, []);
 
   const errorsData: FieldErrors<
+    // @ts-ignore
     Extract<HistoryType, { reasonLeavingPreviousJob: 'other' }> &
       Extract<HistoryType, { education: 'other' }> &
       Extract<HistoryType, { hasPreviousEmployers: true }> &

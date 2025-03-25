@@ -44,8 +44,8 @@ const Checkbox = React.forwardRef<
         ref={ref}
         className={cn(
           // accessibility
-          'focus-visible:ring-surface-accent focus-visible:ring-2 focus-visible:ring-offset-2',
-          'data-[state=unchecked]:border-border-base data-[state=checked]:bg-surface-accent lg:hover:border-surface-accent data-[state=checked]:text-text-inverted size-5 shrink-0 rounded focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=unchecked]:border-2',
+          'focus-visible:ring-sky-500 focus-visible:ring-2 focus-visible:ring-offset-2',
+          'data-[state=unchecked]:border-black data-[state=checked]:bg-sky-500 lg:hover:border-sky-ring-sky-500 data-[state=checked]:text-text-inverted size-5 shrink-0 rounded focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=unchecked]:border-2',
           className
         )}
         disabled={props.disabled}
@@ -75,19 +75,19 @@ const Checkbox = React.forwardRef<
             </span>
           ) : (
             <div className='flex size-3 items-center justify-center rounded'>
-              <div className='bg-text-inverted h-0.5 w-2 rounded-full' />
+              <div className='bg-gray-500 h-0.5 w-2 rounded-full' />
             </div>
           )}
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
       <div className='flex flex-col items-start gap-1'>
         {customLabel ? (
-          <Slot className='text-text-base font-medium'>{customLabel}</Slot>
+          <Slot className='text-black font-medium'>{customLabel}</Slot>
         ) : label ? (
           <Label
             htmlFor={name}
             className={cn(
-              props.disabled && 'text-text-base cursor-not-allowed font-medium'
+              props.disabled && 'text-black cursor-not-allowed font-medium'
             )}
           >
             {label}
@@ -98,8 +98,8 @@ const Checkbox = React.forwardRef<
         ) : helpText ? (
           <p
             className={cn(
-              'text-text-light body-xs',
-              props.disabled && 'text-text-disabled cursor-not-allowed'
+              'text-gray-400 body-xs',
+              props.disabled && 'text-gray-400 cursor-not-allowed'
             )}
           >
             {helpText}

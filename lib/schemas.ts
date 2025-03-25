@@ -99,3 +99,20 @@ export const historySchema = z
 // });
 
 export type HistoryType = z.infer<typeof historySchema>;
+
+export type SkillsType = z.infer<typeof skillsSchema>;
+export const skillsSchema = z.object({
+  coreCompetencies: z.string().min(2),
+  languagesSpoken: z.array(z.string().min(2)).optional(),
+  projectManager: z.string().min(2),
+  communications: z.string().min(2),
+  technicalSkills: z.string().min(2),
+  leadership: z.string().min(2),
+  problemSolving: z.string().min(2),
+  skillSets: z.array(
+    z.object({
+      skillSet: z.string().min(2),
+      level: z.string().min(2),
+    })
+  ),
+});
