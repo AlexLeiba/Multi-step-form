@@ -102,8 +102,8 @@ export type HistoryType = z.infer<typeof historySchema>;
 
 export type SkillsType = z.infer<typeof skillsSchema>;
 export const skillsSchema = z.object({
-  coreCompetencies: z.string().min(2),
-  languagesSpoken: z.array(z.string().min(2)).optional(),
+  // coreCompetencies: z.string().min(2),
+  // languagesSpoken: z.array(z.string().min(2)).optional(),
   projectManager: z.string().min(2),
   communications: z.string().min(2),
   technicalSkills: z.string().min(2),

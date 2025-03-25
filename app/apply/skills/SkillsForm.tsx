@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import Dropdown from '@/components/ui/dropdown';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { skillsSchema, SkillsType } from '@/lib/schemas';
@@ -11,15 +11,14 @@ import { Plus, RefreshCcw } from 'lucide-react';
 import { IconCheck, IconChevronDown } from '@tabler/icons-react';
 
 export function SkillsForm() {
-  const [selectLanguages, setSelectedLanguages] = useState(['Romanian']);
+  const [selectLanguages, setSelectedLanguages] = useState(['']);
   const [selectCompentencies, setSelectedCompentencies] = useState(['']);
   const [openLanguages, setOpenLanguages] = useState(false);
   const [openCompetencies, setOpenCompetencies] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const formMethods = useForm<SkillsType>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
-      coreCompetencies: '',
-      languagesSpoken: ['Romanian'],
       projectManager: '',
       communications: '',
       technicalSkills: '',
@@ -31,7 +30,7 @@ export function SkillsForm() {
   });
 
   const { storedValue, onChangeValue } = useLocalStorage<SkillsType>({
-    key: 'personalInfo',
+    key: 'skills',
   });
 
   const {
@@ -39,7 +38,6 @@ export function SkillsForm() {
     control,
     formState: { errors },
     reset,
-    getValues,
   } = formMethods;
 
   console.log('🚀 ~ SkillsForm ~ errors:', errors);
@@ -47,7 +45,25 @@ export function SkillsForm() {
   function onSubmit(formData: SkillsType) {
     console.log('personalInfo=>>> \n\n', formData);
 
-    onChangeValue(formData);
+    const formDataWithExtrafields: SkillsType & {
+      languagesSpoken: string[];
+      coreCompetencies: string[];
+    } = {
+      ...formData,
+      languagesSpoken: selectLanguages.length > 0 ? selectLanguages : [],
+      coreCompetencies:
+        selectCompentencies.length > 0 ? selectCompentencies : [],
+    };
+
+    if (selectLanguages.length === 0)
+      formDataWithExtrafields.languagesSpoken = [];
+    else formDataWithExtrafields.languagesSpoken = selectLanguages;
+
+    if (selectCompentencies.length === 0)
+      formDataWithExtrafields.coreCompetencies = [];
+    else formDataWithExtrafields.coreCompetencies = selectCompentencies;
+
+    onChangeValue(formDataWithExtrafields);
   }
   useEffect(() => {
     if (storedValue) {
@@ -59,6 +75,18 @@ export function SkillsForm() {
       });
     }
   }, [storedValue]);
+
+  useEffect(() => {
+    document.addEventListener('click', (e) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setOpenLanguages(false);
+        setOpenCompetencies(false);
+      }
+    });
+  }, []);
 
   function handleOpenLanguages() {
     setOpenLanguages(!openLanguages);
@@ -73,7 +101,6 @@ export function SkillsForm() {
     } else {
       setSelectedLanguages((prev) => [...prev, language]);
     }
-    console.log('ssss', getValues('languagesSpoken'));
   };
   const handleCompetencies = (language: string) => {
     if (selectCompentencies?.includes(language)) {
@@ -83,7 +110,6 @@ export function SkillsForm() {
     } else {
       setSelectedCompentencies((prev) => [...prev, language]);
     }
-    console.log('ssss', getValues('languagesSpoken'));
   };
 
   if (!storedValue) return;
@@ -105,25 +131,26 @@ export function SkillsForm() {
 
       <div className='h-full flex flex-col justify-between'>
         <div>
-          <div className='grid grid-cols-2 gap-6 '>
+          <div className='grid grid-cols-2 gap-6 ' ref={dropdownRef}>
             <div className='relative'>
               <p className='body-sm'>Core competencies:</p>
               <Spacer size={1} />
               <Button
                 size={'lg'}
-                className='bg-white text-black w-full'
+                className='bg-white text-black w-full hover:bg-gray-100 cursor-pointer'
                 onClick={handleOpenCompetencies}
               >
-                Competencies {selectCompentencies.length} <IconChevronDown />
+                Select Competencies {selectCompentencies.length - 1}{' '}
+                <IconChevronDown />
               </Button>
               {openCompetencies && (
-                <div className='bg-white text-black rounded-md py-2 absolute  left-0 z-10 w-[200px]'>
+                <div className='bg-white text-black rounded-md py-2 absolute  left-0 z-10 w-[250px]'>
                   <div className='flex gap-2 flex-col items-center '>
                     <p
                       onClick={() => setSelectedCompentencies([])}
                       className='cursor-pointer'
                     >
-                      Clear filters
+                      Clear selection
                     </p>
                     {coreCompetenciesData.map((language, index) => {
                       return (
@@ -148,25 +175,26 @@ export function SkillsForm() {
               )}
             </div>
 
-            <div className='relative'>
+            <div className='relative' ref={dropdownRef}>
               <p className='body-sm'>Languages:</p>
               <Spacer size={1} />
 
               <Button
                 size={'lg'}
-                className='bg-white text-black w-full'
+                className='bg-white text-black w-full  hover:bg-gray-100 cursor-pointer'
                 onClick={handleOpenLanguages}
               >
-                Languages {selectLanguages.length} <IconChevronDown />
+                Select Languages {selectLanguages.length - 1}{' '}
+                <IconChevronDown />
               </Button>
               {openLanguages && (
-                <div className='bg-white text-black rounded-md py-2 absolute top-16 left-0 z-10 w-[200px]'>
+                <div className='bg-white text-black rounded-md py-2 absolute top-16 left-0 z-10 w-[250px]'>
                   <div className='flex gap-2 flex-col items-center '>
                     <p
                       onClick={() => setSelectedLanguages([])}
                       className='cursor-pointer'
                     >
-                      Clear filters
+                      Clear selection
                     </p>
                     {languagesData.map((language, index) => {
                       return (
@@ -203,24 +231,10 @@ export function SkillsForm() {
                 return (
                   <Dropdown
                     defaultValue={
-                      value || storedValue?.projectManager || 'selectCity'
+                      value || storedValue?.projectManager || 'Select level'
                     }
                     label='Project manager'
-                    options={[
-                      {
-                        label: 'Select city',
-                        value: 'selectCity',
-                        image: '',
-                        id: '',
-                      },
-                      {
-                        label: 'Timisoara',
-                        value: 'timisoara',
-                        image: '',
-                        id: '1',
-                      },
-                      { label: 'Oradea', value: 'oradea', image: '', id: '2' },
-                    ]}
+                    options={levelsData}
                     onChange={(v) => {
                       onChange(v);
                     }}
@@ -236,24 +250,10 @@ export function SkillsForm() {
                 return (
                   <Dropdown
                     defaultValue={
-                      value || storedValue?.communications || 'selectCity'
+                      value || storedValue?.communications || 'Select level'
                     }
                     label='Communications'
-                    options={[
-                      {
-                        label: 'Select city',
-                        value: 'selectCity',
-                        image: '',
-                        id: '',
-                      },
-                      {
-                        label: 'Timisoara',
-                        value: 'timisoara',
-                        image: '',
-                        id: '1',
-                      },
-                      { label: 'Oradea', value: 'oradea', image: '', id: '2' },
-                    ]}
+                    options={levelsData}
                     onChange={(v) => {
                       onChange(v);
                     }}
@@ -272,21 +272,7 @@ export function SkillsForm() {
                       value || storedValue?.technicalSkills || 'selectCity'
                     }
                     label='Technical Skills'
-                    options={[
-                      {
-                        label: 'Select city',
-                        value: 'selectCity',
-                        image: '',
-                        id: '',
-                      },
-                      {
-                        label: 'Timisoara',
-                        value: 'timisoara',
-                        image: '',
-                        id: '1',
-                      },
-                      { label: 'Oradea', value: 'oradea', image: '', id: '2' },
-                    ]}
+                    options={levelsData}
                     onChange={(v) => {
                       onChange(v);
                     }}
@@ -302,57 +288,10 @@ export function SkillsForm() {
                 return (
                   <Dropdown
                     defaultValue={
-                      value || storedValue?.problemSolving || 'selectCity'
+                      value || storedValue?.problemSolving || 'Select level'
                     }
                     label='Problem Solving'
-                    options={[
-                      {
-                        label: 'Select city',
-                        value: 'selectCity',
-                        image: '',
-                        id: '',
-                      },
-                      {
-                        label: 'Timisoara',
-                        value: 'timisoara',
-                        image: '',
-                        id: '1',
-                      },
-                      { label: 'Oradea', value: 'oradea', image: '', id: '2' },
-                    ]}
-                    onChange={(v) => {
-                      onChange(v);
-                    }}
-                    error={errors.problemSolving?.message}
-                  />
-                );
-              }}
-            />
-            <Controller
-              name='leadership'
-              control={control}
-              render={({ field: { onChange, value } }) => {
-                return (
-                  <Dropdown
-                    defaultValue={
-                      value || storedValue?.leadership || 'selectCity'
-                    }
-                    label='Leadership'
-                    options={[
-                      {
-                        label: 'Select city',
-                        value: 'selectCity',
-                        image: '',
-                        id: '',
-                      },
-                      {
-                        label: 'Timisoara',
-                        value: 'timisoara',
-                        image: '',
-                        id: '1',
-                      },
-                      { label: 'Oradea', value: 'oradea', image: '', id: '2' },
-                    ]}
+                    options={levelsData}
                     onChange={(v) => {
                       onChange(v);
                     }}
@@ -391,6 +330,24 @@ export function SkillsForm() {
   );
 }
 
+const levelsData = [
+  {
+    label: '1',
+    value: '1',
+    image: '',
+    id: '',
+  },
+  {
+    label: '2',
+    value: '2',
+    image: '',
+    id: '1',
+  },
+  { label: '3', value: '3', image: '', id: '2' },
+  { label: '4', value: '4', image: '', id: '2' },
+  { label: '5', value: '5', image: '', id: '2' },
+];
+
 const languagesData = [
   { title: 'Romanian' },
   { title: 'English' },
@@ -400,12 +357,6 @@ const languagesData = [
 ];
 
 const coreCompetenciesData = [
-  {
-    label: 'Select competence',
-    value: 'coreCompetencies',
-    image: '',
-    id: '',
-  },
   {
     label: 'Team player',
     value: 'Team player',
